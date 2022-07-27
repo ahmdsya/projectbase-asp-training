@@ -1,0 +1,146 @@
+﻿@{
+    ViewBag.Title = "Product";
+}
+
+<section class="content container-fluid">
+    <div class="box" style="min-height: 250px">
+        <div class="box-header with-border">
+            <h4>@ViewBag.Title</h4>
+        </div>
+        <div class="box-body" style="min-height: 100%">
+            <div class="table-responsive">
+                <table id="mainGrid" class="display compact nowrap" style="width:100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a href="@Url.Action("Editor", "Product", new { mode = Constants.FORM_MODE_CREATE })" class="btn btn-success btn-sm btn-flat"><i class="fa fa-plus"></i> Create</a>
+                            </th>
+                            <th>Id</th>
+                            <th>Product Name</th>
+                            <th>Product Quantity</th>
+                            <th>Product UOM</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Press enter<br />after typing<br />to filter</th>
+                            <th>Id</th>
+                            <th>Product Name</th>
+                            <th>Product Quantity</th>
+                            <th>Product UOM</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#mainGrid tfoot th').each(function (i) {
+                        if (i != 0) {
+                            var title = $(this).text();
+                            $(this).html('<input type="text" style="width:10px" name="filter[' + i + ']" placeholder="' + title + '" />');
+                        }
+                    });
+                    var table = $("#mainGrid").DataTable({
+                        "bStateSave": true,
+                        "bFilter": false,
+                        "Tanking": true,
+                        "serverSide": true,
+                        "filter": true,
+                        "orderMulti": true,
+                        "scrollX": true,
+                        "stateSave": true,
+                        "stateDuration": -1,
+                        "ajax": {
+                            "url": '@Url.Action("LoadData", "Product")',
+                            "type": "POST",
+                            "datatype": "json",
+                            "data": function (params) {
+                                $(params.columns).each(function (i) {
+                                    var name = "filter[" + i + "]";
+                                    var value = "";
+                                    if ($('input[name="' + name + '"]').last().length) {
+                                        value = $('input[name="' + name + '"]').last().val();
+                                    }
+                                    params[name] = value;
+                                    params["DateFrom"] = "";
+                                });
+                                return params;
+                            }
+                        },
+                        "order": [[1, "desc"]],
+                        "columnDefs": [
+                            {
+                                "targets": [0],
+                                "orderable": false
+                            },
+                            {
+                                "targets": [1],
+                                "visible": false,
+                                "searchable": false
+                            }
+                        ],
+                        "columns": [
+                            {
+                                "render": function (data, type, full, meta) {
+                                    var link = '<a title="View" href="@Url.Action("Editor", "Product", new { mode = Constants.FORM_MODE_VIEW })&Id=' + full.Id + '" class="btn btn-default btn-xs btn-flat"><i class="fa fa-search"></i></a>&nbsp';
+                                    link += '<a title="Edit" href="@Url.Action("Editor", "Product", new { mode = Constants.FORM_MODE_EDIT })&Id=' + full.Id + '" class="btn btn-primary btn-xs btn-flat"><i class="fa fa-pencil"></i></a>&nbsp';
+                                    link += '<a title="Edit" href="@Url.Action("Editor", "Product", new { mode = Constants.FORM_MODE_DELETE })&Id=' + full.Id + '" class="btn btn-danger btn-xs btn-flat"><i class="fa fa-trash"></i></a>&nbsp';
+                                    return link;
+                                }
+                            },
+                            { "data": "Id", "name": "Id", "autoWidth": true },
+                            { "data": "Product_Name", "name": "Product Name", "autoWidth": true },
+                            { "data": "Product_Qty", "name": "Product Quantity", "autoWidth": true },
+                            { "data": "Product_UOM", "name": "Product UOM", "autoWidth": true },
+                        ],
+                        "initComplete": function (settings, json) {
+                            var scrollBody = $("table#mainGrid").closest(".dataTables_scrollBody");
+                            var scrollFoot = scrollBody.siblings(".dataTables_scrollFoot").find(".dataTables_scrollFootInner");
+                            var scrollHead = scrollBody.siblings(".dataTables_scrollHead").find(".dataTables_scrollHeadInner");
+
+                            $('table tfoot th', scrollFoot).each(function (i) {
+                                if (i != 0) {
+                                    $(this).find("input").attr("style", "max-width :" + $(this).width() + 'px');
+                                }
+                                else {
+                                    $(this).width($("table thead th", scrollHead).first().width() + 'px');
+                                }
+                            });
+                        },
+                        "stateSaveParams": function (settings, data) {
+                            var temp = {};
+                            var inputs = $("input", table.columns().footer());
+                            $(inputs).each(function (n, el) {
+                                temp[$(this).attr('name')] = this.value;
+                            });
+                            data.colsFilter = temp;
+                        },
+                        "stateLoadParams": function (e, settings, data) {
+                            var a = $(this);
+                            if (settings != undefined && settings.colsFilter != undefined) {
+                                var value = "";
+                                $.each(settings.colsFilter, function (key, val) {
+                                    $("input[name='" + key + "']", a.DataTable().columns().footer()).val(val);
+                                    //if (val) value = val;
+                                    //$('#mainGrid tfoot input[name="' + key + '"]').val(val);
+                                });
+                            }
+                        }
+                    });
+
+                    table.columns().every(function () {
+                        var that = this;
+                        $('input', this.footer()).on('keyup change', function (e, el) {
+                            if (e.keyCode == 13) {
+                                that
+                                    .search(this.value)
+                                    .draw();
+                            }
+                        });
+                    });
+                    $(".dataTables_length").attr("style", "display:none");
+                });
+            </script>
+        </div>
+    </div>
+</section>

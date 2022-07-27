@@ -1,0 +1,662 @@
+﻿@using Newtonsoft.Json;
+@using ProjectBase.Utilities;
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="~/favicon.ico" rel="icon" type="image/ico" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewBag.Title - ProjectBase</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    @{
+        string actionName = HttpContext.Current.Request.RequestContext.RouteData.Values["action"].ToString();
+        string controllerName = HttpContext.Current.Request.RequestContext.RouteData.Values["controller"].ToString();
+        string username = User.Identity.GetUserDataByKey(Constants.CLAIM_EMPLOYEE_NUMBER);
+        bool loginByAD = User.Identity.GetUserDataByKey(Constants.CLAIM_LOGIN_BY_AD) == "1" ? true : false;
+
+        Group_Menu groupMenu = null;
+        bool view = false, delete = false, create = false, edit = false, print = false;
+
+        if (User.Identity.GetUserDataByKey(Constants.CLAIM_IS_ADMIN) == "1")
+        {
+            view = true;
+            create = true;
+            edit = true;
+            print = true;
+            delete = true;
+        }
+        else
+        {
+            bool hasAuth = UUtils.UserHasAuthorization(username, actionName, controllerName, out groupMenu);
+
+            if (hasAuth)
+            {
+                view = groupMenu.View;
+                create = groupMenu.Create;
+                edit = groupMenu.Edit;
+                delete = groupMenu.Delete;
+                print = groupMenu.Print;
+            }
+        }
+    }
+    @Scripts.RenderFormat("<script type='text/javascript' src='{0}'></script>", "~/jquery/js")
+    @{
+        if (controllerName.ToLower() == "home" && actionName.ToLower() == "index")
+        {
+            @Styles.Render("~/adminlte_dashboard/css")
+            @Scripts.RenderFormat("<script type='text/javascript' src='{0}'></script>", "~/adminlte_dashboard/js")
+        }
+        else
+        {
+            @Styles.Render("~/adminlte_min/css")
+            @Scripts.RenderFormat("<script type='text/javascript' src='{0}'></script>", "~/adminlte_min/js")
+        }
+    }
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if ("@ViewContext.RouteData.Values["controller"].ToString().ToLower()" == "master"){
+                $('a[href^="/@ViewContext.RouteData.Values["controller"]/@ViewContext.RouteData.Values["action"]').addClass('active').parents('li').addClass('active');
+            }
+            else{
+                $('a[href^="/@ViewContext.RouteData.Values["controller"]/@ViewContext.RouteData.Values["action"]"').addClass('active').parents('li').addClass('active');
+                $('a[href^="/@ViewContext.RouteData.Values["controller"]').addClass('active').parents('li').addClass('active');
+            }
+
+            reInitInputs();
+
+            $("a[href*='/'][target!='_blank'][class!='no-preloader']").on("click", function (e) {
+                if (!e.ctrlKey && ($(this).data('target') != "_blank")) {
+                    if ($(this).attr("href") != "javascript:void(0)") {
+                        $(".se-pre-con").fadeIn("fast");
+                    }
+                }
+            });
+
+            $("input").click(function (e) {
+                $(this).select();
+            });
+
+            var keyCodes = {
+                'up': 38,
+                'down': 40,
+                'left': 37,
+                'right': 39
+            };
+            var notReadonly = "input:not([readonly])"
+            $("input").on("focus", function () {
+                var readonly = $(this).prop("readonly");
+
+                if (readonly)
+                    this.blur();
+            });
+            $('input').keyup(function (e) {
+                var input,
+                    col = 'td:eq(' + $(this).closest('td').index() + ')';
+
+                var a = $(this).closest('td').prevAll();
+
+
+                if (e.which == keyCodes.right)
+                    input = $(this).closest('td').nextAll();
+                else if (e.which == keyCodes.left)
+                    input = $(this).closest('td').prevAll();
+                else if (e.which == keyCodes.down)
+                    input = $(this).closest('tr').nextAll().find(col).first();
+                else if (e.which == keyCodes.up)
+                    input = $(this).closest('tr').prevAll().find(col).last();
+                if (input) {
+                    if (e.which == keyCodes.left) input.find(notReadonly).last().select();
+                    else input.find(notReadonly).first().select();
+
+                }
+
+                $('.ui-datepicker-calendar').css("display", "none");
+            });
+
+        });
+        $(window).on('load', function () {
+            $(".se-pre-con").fadeOut("slow");
+        });
+
+        function reInitInputs() {
+            $(".datepicker").datepicker({
+                format: 'dd/mm/yyyy',
+                autoclose: true
+            });
+            $(".datetimepicker").datetimepicker({
+                sideBySide: true,
+                format: "DD/MM/YYYY HH:mm"
+            });
+
+            $(".datetimepicker_global").datetimepicker({
+                sideBySide: true,
+                format: "YYYY-MM-DD HH:mm"
+            });
+            $(".timepicker").timepicker({
+                showInputs: true,
+                showMeridian: false,
+                defaultTime: false,
+            });
+            $(".timepicker-current").timepicker({
+                showInputs: true,
+                showMeridian: false,
+            });
+            $(".no-decimals").unbind();
+            $(".one-decimals").unbind();
+            $(".three-decimals").unbind();
+            $(".eight-decimals").unbind();
+            $(".four-decimals").unbind();
+            $(".two-decimals").unbind();
+
+            $(".no-decimals").number(true, 0, '.', ',');
+            $(".one-decimals").number(true, 1, '.', ',');
+            $(".three-decimals").number(true, 3, '.', ',');
+            $(".eight-decimals").number(true, 8, '.', ',');
+            $(".four-decimals").number(true, 4, '.', ',');
+            $(".two-decimals").number(true, 2, '.', ',');
+            $("input").click(function (e) {
+                $(this).select();
+            });
+
+            var keyCodes = {
+                'up': 38,
+                'down': 40,
+                'left': 37,
+                'right': 39
+            };
+            var notReadonly = "input:not([readonly])"
+            $("input,select").on("focus", function () {
+                var readonly = $(this).prop("readonly");
+
+                if (readonly)
+                    this.blur();
+            });
+            $('input,select').keyup(function (e) {
+                var input,
+                    col = 'td:eq(' + $(this).closest('td').index() + ')';
+
+                var a = $(this).closest('td').prevAll();
+
+
+                if (e.which == keyCodes.right)
+                    input = $(this).closest('td').nextAll();
+                else if (e.which == keyCodes.left)
+                    input = $(this).closest('td').prevAll();
+                else if (e.which == keyCodes.down)
+                    input = $(this).closest('tr').nextAll().find(col).first();
+                else if (e.which == keyCodes.up)
+                    input = $(this).closest('tr').prevAll().find(col).last();
+
+                if (input) {
+                    if (e.which == keyCodes.left) input.find(notReadonly).last().select();
+                    else input.find(notReadonly).first().select();
+                }
+
+                $('.ui-datepicker-calendar').css("display", "none");
+            });
+
+            $('input,select').keydown(function (e) {
+                var input,
+                    col = 'td:eq(' + $(this).closest('td').index() + ')';
+
+                var a = $(this).closest('td').prevAll();
+
+                if (e.which == 13) {
+                    input = $(this).closest('td').nextAll();
+                    e.preventDefault();
+                }
+
+                if (input) {
+                    if (e.which == keyCodes.left) input.find(notReadonly).last().select();
+                    else input.find(notReadonly).first().select();
+
+                }
+            });
+        }
+
+        var dontBlock = false;
+        function InitAjaxSelect2(el, ajaxURL, dataCB, minLength, initFirst, allowClear) {
+            minLength = minLength || 3;
+            if (minLength == -1) minLength = 0;
+            initFirst = initFirst || false;
+            allowClear = (typeof allowClear !== 'undefined') ? allowClear : true;
+            var placeholder = allowClear ? "- Please select -" : "";
+
+            var elValue = $(el).val();
+
+            if (elValue == "" && initFirst) {
+                el.select2({
+                    destroy: true,
+                    placeholder: placeholder,
+                    minimumInputLength: minLength,
+                    allowClear: allowClear,
+                    ajax: {
+                        url: ajaxURL,
+                        width: 'resolve',
+                        data: function (params, page) {
+                            dontBlock = true;
+                            return $.extend({ q: params, page: (page - 1) }, (dataCB()))
+                        },
+                        processResults: function (data) {
+                            dontBlock = false;
+                            return {
+                                results: data.items,
+                                more: data.items.length >= 10 ? true : false
+                            };
+                        },
+                        minimumInputLength: minLength,
+                        width: 'resolve'
+                    },
+                    initSelection: function (element, callback) {
+                        var id = $(element).val();
+                        if (id && id != "0") {
+                            ajaxData = $.extend({ initValue: id, page: 0 }, (dataCB()));
+                            dontBlock = true;
+                            $.ajax({
+                                url: ajaxURL,
+                                type: "POST",
+                                datatype: "json",
+                                contentType: "application/json; charset=utf-8",
+                                data: JSON.stringify(ajaxData),
+                                success: function (response) {
+                                    dontBlock = false;
+                                    var data = response.items;
+                                    if (data) {
+                                        result = data;
+                                    }
+                                },
+                                fail: function () {
+                                }
+                            }).done(function (data) {
+                                if (data && data.items && data.items.length > 0) {
+                                    callback(data.items[0]);
+                                    $(el).val(data.items[0].id);
+                                }
+
+                            });
+                        } else {
+                            if (initFirst) {
+                                ajaxData = $.extend({ initValue: "", page: 0 }, (dataCB()));
+                                dontBlock = true;
+                                $.ajax({
+                                    url: ajaxURL,
+                                    type: "POST",
+                                    datatype: "json",
+                                    contentType: "application/json; charset=utf-8",
+                                    data: JSON.stringify(ajaxData),
+                                    success: function (response) {
+                                        dontBlock = false;
+                                        var data = response.items;
+                                        if (data) {
+                                            result = data;
+                                        }
+                                    },
+                                    fail: function () {
+                                    }
+                                }).done(function (data) {
+                                    if (data && data.items && data.items.length > 0) {
+                                        callback(data.items[0]);
+                                        $(el).val(data.items[0].id).change();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }).select2('val', []);;
+            }
+            else {
+                el.select2({
+                    destroy: true,
+                    placeholder: placeholder,
+                    minimumInputLength: minLength,
+                    allowClear: allowClear,
+                    ajax: {
+                        url: ajaxURL,
+                        width: 'resolve',
+                        data: function (params, page) {
+                            dontBlock = true;
+                            return $.extend({ q: params, page: (page - 1) }, (dataCB()))
+                        },
+                        processResults: function (data) {
+                            dontBlock = false;
+                            return {
+                                results: data.items,
+                                more: data.items.length >= 10 ? true : false
+                            };
+                        },
+                        minimumInputLength: minLength,
+                        width: 'resolve'
+                    },
+                    initSelection: function (element, callback) {
+                        var id = $(element).val();
+                        if (id && id != "0") {
+                            ajaxData = $.extend({ initValue: id, page: 0, initExactValue: true }, (dataCB()));
+                            dontBlock = true;
+                            $.ajax({
+                                url: ajaxURL,
+                                type: "POST",
+                                datatype: "json",
+                                contentType: "application/json; charset=utf-8",
+                                data: JSON.stringify(ajaxData),
+                                success: function (response) {
+                                    dontBlock = false;
+                                    var data = response.items;
+                                    if (data) {
+                                        result = data;
+                                    }
+                                },
+                                fail: function () {
+                                }
+                            }).done(function (data) {
+                                if (data && data.items && data.items.length > 0) {
+                                    callback(data.items[0]);
+                                    $(el).val(data.items[0].id);
+                                }
+
+                            });
+                        } else {
+                            if (initFirst) {
+                                ajaxData = $.extend({ q: "", page: 0, initExactValue: initExactValue }, (dataCB()));
+                                dontBlock = true;
+                                $.ajax({
+                                    url: ajaxURL,
+                                    type: "POST",
+                                    datatype: "json",
+                                    contentType: "application/json; charset=utf-8",
+                                    data: JSON.stringify(ajaxData),
+                                    success: function (response) {
+                                        dontBlock = false;
+                                        var data = response.items;
+                                        if (data) {
+                                            result = data;
+                                        }
+                                    },
+                                    fail: function () {
+                                    }
+                                }).done(function (data) {
+                                    if (data && data.items && data.items.length > 0) {
+                                        callback(data.items[0]);
+                                        @*if ("@(Request.QueryString["mode"] == Constants.FORM_MODE_CREATE ? "True" : "False")" == "True") *@
+
+                                        $(el).val(data.items[0].id).change();
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function InitDataSelect2(el, data, minLength) {
+            minLength = minLength || 3;
+            if (minLength == -1) minLength = 0;
+
+            el.select2({
+                destroy: true,
+                placeholder: "- Please select -",
+                minimumInputLength: minLength,
+                allowClear: true,
+                data: data
+            });
+        }
+
+        function toggleHeader(element) {
+            var header = $("#sectionHeader");
+            var section = $("#sectionDetail").closest("section");
+
+            if (header.length > 0) {
+                var length = "";
+                var sLength = 0;
+                var classList = $(header).attr('class').split(/\s+/);
+                $.each(classList, function (index, item) {
+                    if (item.includes('col-md')) {
+                        length = item.split('-')[2];
+                        return false;
+                    }
+                });
+
+                sLength = 12 - parseFloat(length);
+
+                if (header.css('display') == "none") {
+                    header.css("display", "block");
+                    $(section).removeClass('col-md-12');
+                    $(section).addClass('col-md-'+ sLength);
+                }
+                else {
+                    header.css("display", "none");
+                    $(section).removeClass('col-md-' + sLength);
+                    $(section).addClass('col-md-12');
+                }
+            }
+        }
+
+        @{
+            if (controllerName.ToLower() == "home" && actionName.ToLower() == "index"){}
+            else
+            {
+                <text>
+                    $(document).ajaxStart(function () {
+                        if (!dontBlock)
+                            $.blockUI({
+                                baseZ: 2000
+
+                            });
+                    }).ajaxStop($.unblockUI);
+                </text>
+            }
+        }
+    </script>
+    <style type="text/css">
+        .form-group {
+            margin-bottom : 10px !important;
+        }
+        .no-js #loader {
+            display: none;
+        }
+
+        .js #loader {
+            display: block;
+            position: absolute;
+            left: 100px;
+            top: 0;
+        }
+
+        .se-pre-con {
+            position: fixed;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            background: url(@Url.Content("~/Media/preloader/images/loader-128x/Preloader_5.gif")) center no-repeat #fff;
+            opacity: 0.8;
+        }
+
+        div.datepicker.datepicker-orient-top{
+            z-index: 10000 !important;
+        }
+        .content-header {
+            padding: 5px 5px 0 15px !important;
+            margin-bottom: 10px !important;
+        }
+
+        .dataTables_filter {
+           float: left !important;
+        }
+    </style>
+</head>
+<body class="skin-blue sidebar-mini sidebar-collapse">
+    <script>
+        (function () {
+            var x = sessionStorage.getItem('sidebar-toggle-collapsed');
+            if (Boolean(sessionStorage.getItem('sidebar-toggle-collapsed'))) {
+                $("body").addClass('sidebar-collapse');
+            }
+            else {
+                $("body").removeClass('sidebar-collapse');
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header class="main-header">
+            <a href='@Url.Action("Index", "Home")' class="logo">
+                <span class="logo-mini"><i class="fa fa-globe"></i></span>
+                <span class="logo-sm"><b>ProjectBase</b></span>
+            </a>
+            <nav class="navbar navbar-static-top" role="navigation">
+                <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        @*<li class="dropdown notifications-menu">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fa fa-bell-o"></i>
+                                    <span class="label label-warning">10</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="header">You have 10 notifications</li>
+                                    <li>
+                                        <ul class="menu">
+                                            <li>
+                                                <a href="#">
+                                                    <i class="fa fa-users text-aqua"></i> 5 new members joined today
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="footer"><a href="#">View all</a></li>
+                                </ul>
+                            </li>*@
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="fa fa-user-circle"></i>
+                                <span class="hidden-xs">@User.Identity.GetUserDataByKey(Constants.CLAIM_NAME)</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li class="user-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <p style="text-align: center">
+                                                <i class="fa fa-2x fa-user-circle"></i>
+                                            </p>
+                                            <p style="text-align: center">
+                                                @User.Identity.GetUserDataByKey(Constants.CLAIM_NAME)
+                                            </p>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="user-footer">
+                                    <div class="pull-left">
+                                        @if (!loginByAD)
+                                        {
+                                            <button type="button" class="btn btn-primary btn-flat">Change Password</button>
+                                        }
+                                    </div>
+                                    <div class="pull-right">
+                                        @using (Html.BeginForm("LogOff", "Auth", FormMethod.Post, new { id = "logoutForm" }))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <a href="javascript:document.getElementById('logoutForm').submit()" class="btn btn-default btn-flat bg-red">Log off</a>
+                                        }
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <aside class="main-sidebar">
+            <section class="sidebar">
+                <ul class="sidebar-menu" data-widget="tree">
+                    <li class="header">MAIN MENU</li>
+                    <li><a href='@Url.Action("Index", "Home")'><i class="fa fa-home"></i><span>Dashboard</span></a></li>
+
+                    @{
+                        var a = User.Identity.GetUserDataByKey(Constants.CLAIM_MENU);
+
+                        Menu[] menus = JsonConvert.DeserializeObject<Menu[]>(a);
+
+                        @Html.Raw(UMenu.GetMenuString(menus, Context.Request.RequestContext));
+                    }
+                </ul>
+            </section>
+        </aside>
+        <div class="content-wrapper">
+            <div class="se-pre-con"></div>
+            @{
+                @RenderBody()
+            }
+        </div>
+
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                Version <b>@UUtils.GetAppVersion()</b>
+            </div>
+            <strong>Copyright &copy; @DateTime.Now.Year.ToString() Wilmar Group Indonesia</strong> All rights reserved.
+        </footer>
+        <div class="control-sidebar-bg"></div>
+    </div>
+    <script>
+        $('.sidebar-toggle').click(function (event) {
+            event.preventDefault();
+            if (Boolean(sessionStorage.getItem('sidebar-toggle-collapsed'))) {
+                sessionStorage.setItem('sidebar-toggle-collapsed', '');
+            } else {
+                sessionStorage.setItem('sidebar-toggle-collapsed', '1');
+            }
+        });
+
+        $(document).on('init.dt', function () {
+            @{
+                if(!view) { <text>$(".btn-view").prop("disabled", true);</text> }
+                if(!create)
+                {<text>
+            $("#btn-create").prop("disabled", true);
+            $("#btn-create").attr("disabled", "disabled");
+            $("#btn-create").attr("href", "javascript:void(0)");
+            $("#btn-create").click(function (e) { e.preventDefault(); });
+            </text> }
+                if(!edit) { <text>$(".btn-edit").prop("disabled", true);</text> }
+                if(!delete) { <text>$(".btn-delete").prop("disabled", true);</text> }
+                if (!print) { <text>$(".btn-print").prop("disabled", true);</text> }
+            }
+        });
+
+        $(document).ready(function () {
+             @{
+                 if (TempData[Constants.TRANS_RESULT] != null /*&& !string.IsNullOrEmpty(ViewData[Constants.TRANS_RESULT] as string)*/)
+                 {
+                     TransResult res = TempData[Constants.TRANS_RESULT] as TransResult;
+                     string message = res.message;
+                     long Id = res.Id;
+                     string action = res.Action;
+                     string controller = res.Controller;
+                     string refNo = res.Ref_No;
+
+                     <text>
+                        bootbox.alert({
+                            message: "@message <a href='@Url.Action(action, controller, new { mode= "View" })&Id=@Id' target='_blank'>@refNo</a>"
+                        });
+                    </text>
+                    TempData[Constants.TRANS_RESULT] = null;
+                }
+            }
+        });
+
+    </script>
+    @{
+        if (controllerName.ToLower() == "home" && actionName.ToLower() == "index")
+        {
+            <script>
+                $.widget.bridge('uibutton', $.ui.button);
+            </script>
+        }
+    }
+</body>
+</html>

@@ -1,0 +1,152 @@
+﻿@using ProjectBase.ViewModels
+@model LoginViewModel
+@{
+    ViewBag.Title = "Login";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="~/favicon.ico" rel="icon" type="image/ico" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewBag.Title</title>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    @Styles.Render("~/adminlte_min/css")
+    @Scripts.RenderFormat("<script type='text/javascript' src='{0}'></script>", "~/jquery/js")
+</head>
+<body class="hold-transition login-page" @*style="background: url('@Url.Content("~/Media/bg-login.jpg")'); background-size: cover;height:auto !important"*@>
+    <div class="login-box">
+        <!--<div class="login-logo">
+            <b>Ticketing</b> System
+        </div>-->
+        <div class="login-box-body" style="background: rgba(255, 255, 255, 0.90);">
+            <div class="register-logo">
+                <img class="user-image" src="@Url.Content("~/Media/home-logo.png")" alt="Logo"><br>
+                <a href="#">
+                    <small style="font-size: 45%!important;"><b>Project Base </b> System</small>
+                    <p style="font-size: 45%!important; text-decoration: underline">Wilmar Group Indonesia</p>
+                </a>
+            </div>
+
+            <p style="font-style: italic; text-align: left; font-size: 10pt">Sign in to start your session</p>
+            @using (Html.BeginForm("Login", "Auth", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
+            {
+                <p class="text-red">@Html.ValidationMessage(Constants._ERROR)</p>
+                @Html.AntiForgeryToken()
+                <div class="form-group has-feedback @(ViewData.ModelState.Keys.Contains("UserName") && ViewData.ModelState["UserName"].Errors.Count > 0 ? "has-error" : "")">
+                    @Html.TextBoxFor(m => m.EmployeeNumber, new { @class = "form-control", placeholder = "Employee Number" })
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                    @Html.ValidationMessageFor(m => m.EmployeeNumber, "", new { @class = "help-block" })
+                </div>
+                <div class="form-group has-feedback @(ViewData.ModelState.Keys.Contains("Password")  && ViewData.ModelState["Password"].Errors.Count > 0 ? "has-error" : "")">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
+                    <span class="glyphicon glyphicon-eye-close form-control-feedback" id="showPass" style="pointer-events:unset !important;z-index:1000 !important;"></span>
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "help-block" })
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="checkbox" style="padding-left: 5px">
+                            @Html.CheckBoxFor(m => m.RememberMe)
+                            @Html.LabelFor(m => m.RememberMe)
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" style="text-align: right">
+                    <input type="submit" value="Login" class="btn btn-primary btn-flat" />
+                </div>
+            }
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    <input type="hidden" id="lblShow" value="hide" />
+    @Scripts.Render("~/adminlte_min/js")
+
+    <script>
+        $(document).ready(function () {
+            $('#showPass').click(function () {
+                var actionShow = $("#lblShow").val();
+
+                if (actionShow == "show") {
+                    $("#Password").attr('type', 'password')
+                    $("#lblShow").val("hide");
+                    $("#showPass").removeClass();
+                    $("#showPass").addClass("glyphicon glyphicon-eye-close form-control-feedback");
+                }
+                else {
+                    $("#Password").attr('type', 'text')
+                    $("#lblShow").val("show");
+                    $("#showPass").removeClass();
+                    $("#showPass").addClass("glyphicon glyphicon-eye-open form-control-feedback");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+

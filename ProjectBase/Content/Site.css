@@ -1,0 +1,58 @@
+﻿/******
+    body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.dl-horizontal dt {
+    white-space: normal;
+}
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+****/
+
+.select2-drop {
+    border-radius: 0px !important;
+}
+
+.select2-container.input-sm .select2-choice, .input-group-sm .select2-container .select2-choice {
+    border-radius: 0px !important;
+}
+
+.select2-container .select2-choices .select2-search-field input, .select2-container .select2-choice, .select2-container .select2-choices {
+    border-radius: 0px !important;
+    font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.select2-container .select2-choice {
+    border-radius: 0px !important;
+    text-align:left;
+}
+
+.select2-search input {
+    border-radius: 0px !important;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}
+
+select2-result-label .select2-match {
+    font-size: 12px !important;
+    font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+.form-horizontal .control-label {
+    text-align: left !important;
+}
+
+.datepicker{
+    border-radius: 0px !important;
+}

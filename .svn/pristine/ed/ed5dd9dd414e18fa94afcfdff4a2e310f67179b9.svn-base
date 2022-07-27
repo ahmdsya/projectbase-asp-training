@@ -1,0 +1,222 @@
+﻿using ProjectBase.Utilities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Web;
+
+namespace ProjectBase.ViewModels
+{
+    public class UserViewModel
+    {
+        public UserViewModel() { }
+
+        public UserViewModel(ProjectBaseEntities db, long id)
+        {
+            User model = db.Users.Find(id);
+            if (model == null) return;
+            BaseProgram.CopyProperties(typeof(User), model, typeof(UserViewModel), this);
+
+            var details = db.User_Group.Where(r => r.User_Id == model.Id).ToList();
+            Details = new List<User_GroupViewModel>();
+            foreach (var detail in details)
+                Details.Add(new User_GroupViewModel(detail));
+        }
+        public UserViewModel(User model)
+        {
+            BaseProgram.CopyProperties(typeof(User), model, typeof(CustomerViewModel), this);
+            mode = Constants.FORM_MODE_UNCHANGED;
+        }
+
+        public void Save(ProjectBaseEntities db)
+        {
+            this.result = Constants.OK;
+            User model;
+            try
+            {
+                if (this.mode == Constants.FORM_MODE_CREATE)
+                {
+                    var existedData = db.Users.Where(r =>
+                                            r.Employee_Number == this.Employee_Number
+                                        ).ToArray();
+                    if (existedData != null && existedData.Length > 0)
+                    {
+                        throw new Exception("Employee Number already exists!");
+                    }
+                    model = new User();
+                    model.Create_By = "[" + System.Web.HttpContext.Current.User.Identity.GetUserDataByKey(Constants.CLAIM_EMPLOYEE_NUMBER) + "] " + System.Web.HttpContext.Current.User.Identity.GetUserDataByKey(Constants.CLAIM_FULLNAME);
+                    model.Create_Date = DateTime.Now;
+                }
+                else
+                {
+                    model = db.Users.Find(this.Id);
+                    model.Edit_By = "[" + System.Web.HttpContext.Current.User.Identity.GetUserDataByKey(Constants.CLAIM_EMPLOYEE_NUMBER) + "] " + System.Web.HttpContext.Current.User.Identity.GetUserDataByKey(Constants.CLAIM_FULLNAME);
+                    model.Edit_Date = DateTime.Now;
+                }
+                model.Employee_Number = this.Employee_Number;
+                model.Full_Name = this.Full_Name;
+                model.Email = this.Email;
+                model.Is_Admin = this.Is_Admin;
+                model.Use_AD = this.Use_AD;
+
+                if (!model.Use_AD)
+                {
+                    if (string.IsNullOrEmpty(this.Password))
+                    {
+                        this.Password = "123456";
+                    }
+                    model.Password = UEncryption.Encrypt(this.Password);
+                }
+
+                using (var transaction = db.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        if (this.mode == Constants.FORM_MODE_CREATE)
+                            db.Entry(model).State = System.Data.Entity.EntityState.Added;
+                        else if (this.mode == Constants.FORM_MODE_EDIT)
+                            db.Entry(model).State = System.Data.Entity.EntityState.Modified;
+                        else if (this.mode == Constants.FORM_MODE_DELETE)
+                            db.Entry(model).State = System.Data.Entity.EntityState.Deleted;
+                        
+                        if (Details != null)
+                        {
+                            foreach (var Detail in Details)
+                            {
+                                if (this.mode == Constants.FORM_MODE_DELETE)
+                                {
+                                    Detail.mode = this.mode;
+
+                                    Detail.Save(db, model);
+                                    if (Detail.result != Constants.OK) throw new Exception(Detail.result);
+                                }
+                                else
+                                {
+                                    if (Detail.mode != Constants.FORM_MODE_UNCHANGED)
+                                    {
+                                        int sameCount = this.Details.Where(r => r.Group_Id == Detail.Group_Id && r.mode != Constants.FORM_MODE_DELETE).Count();
+
+                                        if (sameCount > 1)
+                                        {
+                                            throw new Exception("Multiple detail with same menu is not allowed: " + Detail.Group_Id);
+                                        }
+
+                                        Detail.Save(db, model);
+
+                                        if (Detail.result != Constants.OK) throw new Exception(Detail.result);
+                                    }
+                                }
+                            }
+                        }
+                        db.SaveChanges();
+                        transaction.Commit();
+                    }
+                    catch (Exception exc_)
+                    {
+                        result = "Failed to save data.<br/>Error Message : " + exc_.Message.Replace(Environment.NewLine, " ").Replace("'", "");
+                        transaction.Rollback();
+                    }
+                }
+            }
+            catch (Exception exc)
+            {
+                result = exc.Message.Replace(Environment.NewLine, " ").Replace("'", "");
+            }
+        }
+        public string result { get; set; }
+        public string mode { get; set; }
+        public long Id { get; set; }
+        [Required]
+        [Display(Name = "Employee Number")]
+        public string Employee_Number { get; set; }
+        [Required]
+        [Display(Name = "Full Name")]
+        public string Full_Name { get; set; }
+
+        [Display(Name = "Email")]
+        public string Email { get; set; }
+        [Required]
+        [Display(Name = "Admin")]
+        public bool Is_Admin { get; set; }
+        [Required]
+        [Display(Name ="Use AD")]
+        public bool Use_AD { get; set; }
+        public string Password { get; set; }
+
+        public string Create_By { get; set; }
+        public DateTime Create_Date { get; set; }
+        public string Edit_By { get; set; }
+        public Nullable<System.DateTime> Edit_Date { get; set; }
+
+        public List<User_GroupViewModel> Details { get; set; }
+   
+    }
+
+    public class User_GroupViewModel
+    {
+        public User_GroupViewModel() { }
+        public User_GroupViewModel(ProjectBaseEntities db, long id)
+        {
+            User_Group model = db.User_Group.Find(id);
+            if (model == null) return;
+            BaseProgram.CopyProperties(typeof(User_Group), model, typeof(User_GroupViewModel), this);
+
+            //var details = db.Group_Menu.Where(r => r.Group_Id == model.Id).ToList();
+            //Details = new List<Group_MenuViewModel>();
+            //foreach (var detail in details)
+            //    Details.Add(new Group_MenuViewModel(detail));
+        }
+        public User_GroupViewModel(User_Group model)
+        {
+            BaseProgram.CopyProperties(typeof(User_Group), model, typeof(User_GroupViewModel), this);
+            mode = Constants.FORM_MODE_UNCHANGED;
+        }
+        public void Save(ProjectBaseEntities db, User user = null)
+        {
+            this.result = Constants.OK;
+            User_Group model;
+            try
+            {
+                if (this.mode == Constants.FORM_MODE_CREATE)
+                {
+                    model = new User_Group();
+                    model.Create_By = "[" + System.Web.HttpContext.Current.User.Identity.GetUserDataByKey(Constants.CLAIM_EMPLOYEE_NUMBER) + "] " + System.Web.HttpContext.Current.User.Identity.GetUserDataByKey(Constants.CLAIM_FULLNAME);
+                    model.Create_Date = DateTime.Now;
+                }
+                else
+                {
+                    model = db.User_Group.Find(this.Id);
+                    model.Edit_By = "[" + System.Web.HttpContext.Current.User.Identity.GetUserDataByKey(Constants.CLAIM_EMPLOYEE_NUMBER) + "] " + System.Web.HttpContext.Current.User.Identity.GetUserDataByKey(Constants.CLAIM_FULLNAME);
+                    model.Edit_Date = DateTime.Now;
+                }
+
+                var group = db.Groups.Where(r => r.Id == this.Group_Id).SingleOrDefault();
+
+                if (group == null) throw new Exception("Group not found: " + this.Group_Id);
+
+                model.Group = group;
+                model.User = user;
+                if (this.mode == Constants.FORM_MODE_CREATE)
+                    db.Entry(model).State = System.Data.Entity.EntityState.Added;
+                else if (this.mode == Constants.FORM_MODE_EDIT)
+                    db.Entry(model).State = System.Data.Entity.EntityState.Modified;
+                else if (this.mode == Constants.FORM_MODE_DELETE)
+                    db.Entry(model).State = System.Data.Entity.EntityState.Deleted;
+                db.SaveChanges();
+            }
+            catch (Exception exc)
+            {
+                result = exc.Message.Replace(Environment.NewLine, " ").Replace("'", "");
+            }
+        }
+        public string result { get; set; }
+        public string mode { get; set; }
+        public long Id { get; set; }
+        public long User_Id { get; set; }
+        public long Group_Id { get; set; }
+        public string Create_By { get; set; }
+        public DateTime Create_Date { get; set; }
+        public string Edit_By { get; set; }
+        public Nullable<System.DateTime> Edit_Date { get; set; }
+    }
+}

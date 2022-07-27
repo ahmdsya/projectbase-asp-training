@@ -1,0 +1,98 @@
+﻿@model ProjectBase.Controllers.FilterModel
+@{
+    ViewBag.Title = "Report";
+    var mode = Request.QueryString["mode"];
+}
+
+<style type="text/css">
+    td > .two-decimals, .four-decimals {
+        min-width: 70px !important;
+    }
+
+    th {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    td {
+        vertical-align: middle;
+        text-align: center;
+        padding: 0px !important;
+    }
+
+        td > .form-control {
+            border-color: transparent;
+        }
+</style>
+
+<section class="content-header">
+    <h1>
+        Report
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Filter</a></li>
+    </ol>
+</section>
+
+@using (Html.BeginForm("ShowReport", "Report", new { mode = mode, Id = Request.QueryString["Id"] }, FormMethod.Post, new { id = "EditorForm", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <section class="col-md-12 connectedSortable ui-sortable">
+        <div class="box box-danger">
+            <div class="box-header ui-sortable-handle">
+                <i class="ion ion-bookmark"></i>
+                <h3 class="box-title">Report</h3>
+            </div>
+            <div class="box-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Date_From, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Date_From, new { htmlAttributes = new { @class = "form-control datepicker" } })
+                            @Html.ValidationMessageFor(model => model.Date_From, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Date_To, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Date_To, new { htmlAttributes = new { @class = "form-control datepicker" } })
+                            @Html.ValidationMessageFor(model => model.Date_To, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Customer_Id, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Customer_Id, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Customer_Id, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Product_Id, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Product_Id, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Product_Id, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-sm btn-success btn-flat" id="submit_">Show Report</button>
+                    <div style="display:none">
+                        @*To generate report on different tab, use formtarget="_blank" *@
+                        <input type="submit" id="submit" formtarget="_blank" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            InitAjaxSelect2($("#Customer_Id"), '@Url.Action("CustomerList", "Ajax")', function () { return {} }, -1);
+            InitAjaxSelect2($("#Product_Id"), '@Url.Action("ProductList", "Ajax")', function () { return {} }, -1);
+
+            $("#submit_").click(function () {
+                $("#submit").click();
+            });
+        });
+    </script>
+}

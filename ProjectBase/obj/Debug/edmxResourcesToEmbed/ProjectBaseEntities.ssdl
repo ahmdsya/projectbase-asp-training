@@ -1,0 +1,443 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="ProjectBaseModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Book">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Book_Name" Type="varchar(max)" Nullable="false" />
+    <Property Name="Authors" Type="varchar(max)" Nullable="false" />
+    <Property Name="Price" Type="bigint" Nullable="false" />
+    <Property Name="Quantity" Type="int" Nullable="false" />
+    <Property Name="Created_By" Type="varchar" MaxLength="100" />
+    <Property Name="Created_Date" Type="datetime" />
+    <Property Name="Edited_By" Type="varchar" MaxLength="100" />
+    <Property Name="Edited_Date" Type="datetime" />
+    <Property Name="Is_Deleted" Type="varchar" MaxLength="5" Nullable="false" />
+    <Property Name="Deleted_Date" Type="datetime" />
+    <Property Name="Deleted_By" Type="varchar" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="Customer">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Code" Type="varchar(max)" Nullable="false" />
+    <Property Name="Name" Type="varchar(max)" Nullable="false" />
+    <Property Name="Address" Type="varchar(max)" Nullable="false" />
+    <Property Name="Created_Date" Type="datetime" Nullable="false" />
+    <Property Name="Created_By" Type="varchar(max)" Nullable="false" />
+    <Property Name="Edited_Date" Type="datetime" />
+    <Property Name="Edited_By" Type="varchar(max)" />
+    <Property Name="Is_Deleted" Type="bit" />
+  </EntityType>
+  <EntityType Name="Group">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Group_Code" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="Group_Description" Type="varchar" MaxLength="200" />
+    <Property Name="Create_Date" Type="datetime" />
+    <Property Name="Create_By" Type="varchar" MaxLength="100" />
+    <Property Name="Edit_Date" Type="datetime" />
+    <Property Name="Edit_By" Type="varchar" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="Group_Menu">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Group_Id" Type="bigint" Nullable="false" />
+    <Property Name="Menu_Id" Type="bigint" Nullable="false" />
+    <Property Name="View" Type="bit" Nullable="false" />
+    <Property Name="Edit" Type="bit" Nullable="false" />
+    <Property Name="Delete" Type="bit" Nullable="false" />
+    <Property Name="Create" Type="bit" Nullable="false" />
+    <Property Name="Print" Type="bit" Nullable="false" />
+    <Property Name="Create_Date" Type="datetime" />
+    <Property Name="Create_By" Type="varchar" MaxLength="100" />
+    <Property Name="Edit_Date" Type="datetime" />
+    <Property Name="Edit_By" Type="varchar" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="HeaderDetails">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Header_Id" Type="bigint" />
+    <Property Name="Book_Id" Type="bigint" />
+    <Property Name="Stationary_Id" Type="bigint" />
+    <Property Name="Quantity" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="Qty_Stationary" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="Author" Type="varchar(max)" />
+    <Property Name="Create_Date" Type="datetime" />
+    <Property Name="Create_By" Type="varchar(max)" />
+    <Property Name="Edit_Date" Type="datetime" />
+    <Property Name="Edit_By" Type="varchar(max)" />
+    <Property Name="Delete_Date" Type="datetime" />
+    <Property Name="Delete_By" Type="varchar(max)" />
+    <Property Name="Is_Book_Deleted" Type="bit" />
+    <Property Name="Is_Stationary_Deleted" Type="bit" />
+  </EntityType>
+  <EntityType Name="Location">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Username" Type="varchar(max)" Nullable="false" />
+    <Property Name="Coordinate_X" Type="decimal" Precision="18" Scale="10" Nullable="false" />
+    <Property Name="Coordinate_Y" Type="decimal" Precision="18" Scale="10" Nullable="false" />
+    <Property Name="Tracked_date" Type="datetime" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Menu">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Menu_Name" Type="varchar" MaxLength="100" />
+    <Property Name="Menu_Action" Type="varchar" MaxLength="100" />
+    <Property Name="Menu_Controller" Type="varchar" MaxLength="100" />
+    <Property Name="Menu_Icon" Type="varchar" MaxLength="100" />
+    <Property Name="Parent" Type="bigint" />
+    <Property Name="Ordinal" Type="int" />
+    <Property Name="Visible" Type="bit" />
+  </EntityType>
+  <EntityType Name="Order">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Order_No" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="Order_Date" Type="datetime" Nullable="false" />
+    <Property Name="Order_Customer_Id" Type="bigint" Nullable="false" />
+    <Property Name="Order_Customer_Address" Type="varchar(max)" Nullable="false" />
+    <Property Name="Create_Date" Type="datetime" Nullable="false" />
+    <Property Name="Create_By" Type="varchar" MaxLength="100" Nullable="false" />
+    <Property Name="Edit_Date" Type="datetime" />
+    <Property Name="Edit_By" Type="varchar" MaxLength="100" />
+    <Property Name="Is_Deleted" Type="bit" />
+  </EntityType>
+  <EntityType Name="Order_Detail">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Order_Id" Type="bigint" Nullable="false" />
+    <Property Name="Product_Name" Type="varchar" MaxLength="100" Nullable="false" />
+    <Property Name="Product_Qty" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="Product_UOM" Type="varchar" MaxLength="20" Nullable="false" />
+    <Property Name="Create_Date" Type="datetime" Nullable="false" />
+    <Property Name="Create_By" Type="varchar" MaxLength="100" Nullable="false" />
+    <Property Name="Edit_Date" Type="datetime" />
+    <Property Name="Edit_By" Type="varchar" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="Product">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Product_Name" Type="varchar(max)" Nullable="false" />
+    <Property Name="Product_Qty" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="Product_UOM" Type="varchar" MaxLength="20" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Setting">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Code" Type="varchar" MaxLength="100" />
+    <Property Name="Value" Type="varchar" MaxLength="200" />
+  </EntityType>
+  <EntityType Name="Stationary">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Transaction_No" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="Transaction_Date" Type="datetime" Nullable="false" />
+    <Property Name="Customer_Id" Type="bigint" Nullable="false" />
+    <Property Name="Customer_Address" Type="varchar(max)" Nullable="false" />
+    <Property Name="Create_Date" Type="datetime" Nullable="false" />
+    <Property Name="Create_By" Type="varchar" MaxLength="100" Nullable="false" />
+    <Property Name="Edit_Date" Type="datetime" />
+    <Property Name="Edit_By" Type="varchar" MaxLength="100" />
+    <Property Name="Delete_Date" Type="datetime" />
+    <Property Name="Delete_By" Type="varchar" MaxLength="100" />
+    <Property Name="Is_Delete" Type="varchar" MaxLength="5" />
+  </EntityType>
+  <EntityType Name="Stationary_Detail">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Book_Id" Type="bigint" />
+    <Property Name="Stationary_Id" Type="bigint" />
+    <Property Name="Book_Qty" Type="int" />
+    <Property Name="Book_Authors" Type="varchar(max)" />
+    <Property Name="Product_Id" Type="bigint" />
+    <Property Name="Product_Qty" Type="decimal" Precision="18" Scale="2" />
+    <Property Name="Product_UOM" Type="varchar" MaxLength="20" />
+    <Property Name="Create_Date" Type="datetime" Nullable="false" />
+    <Property Name="Create_By" Type="varchar" MaxLength="100" Nullable="false" />
+    <Property Name="Edit_Date" Type="datetime" />
+    <Property Name="Edit_By" Type="varchar" MaxLength="100" />
+    <Property Name="Delete_Date" Type="datetime" />
+    <Property Name="Delete_By" Type="varchar" MaxLength="100" />
+    <Property Name="Is_Delete" Type="varchar" MaxLength="5" />
+  </EntityType>
+  <EntityType Name="sysdiagrams">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+    <Property Name="principal_id" Type="int" Nullable="false" />
+    <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="version" Type="int" />
+    <Property Name="definition" Type="varbinary(max)" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Employee_Number" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="Full_Name" Type="varchar" MaxLength="150" />
+    <Property Name="Password" Type="varchar" MaxLength="150" />
+    <Property Name="Email" Type="varchar" MaxLength="80" />
+    <Property Name="Is_Admin" Type="bit" Nullable="false" />
+    <Property Name="Use_AD" Type="bit" Nullable="false" />
+    <Property Name="Created_By" Type="varchar" MaxLength="250" Nullable="false" />
+    <Property Name="Created_Date" Type="datetime" Nullable="false" />
+    <Property Name="Edited_By" Type="varchar" MaxLength="250" />
+    <Property Name="Edited_Date" Type="datetime" />
+    <Property Name="Last_Access_Date" Type="datetime" />
+    <Property Name="Is_Deleted" Type="varchar" MaxLength="1" />
+    <Property Name="Deleted_Date" Type="datetime" />
+    <Property Name="Deleted_By" Type="varchar" MaxLength="250" />
+  </EntityType>
+  <EntityType Name="User_Group">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="User_Id" Type="bigint" Nullable="false" />
+    <Property Name="Group_Id" Type="bigint" Nullable="false" />
+    <Property Name="Created_Date" Type="datetime" />
+    <Property Name="Created_By" Type="varchar" MaxLength="200" />
+    <Property Name="Edited_Date" Type="datetime" />
+    <Property Name="Edited_By" Type="varchar" MaxLength="200" />
+    <Property Name="Is_Deleted" Type="varchar" MaxLength="1" />
+    <Property Name="Deleted_Date" Type="datetime" />
+    <Property Name="Deleted_By" Type="varchar" MaxLength="200" />
+  </EntityType>
+  <Association Name="FK_Group_Menu_Group">
+    <End Role="Group" Type="Self.Group" Multiplicity="1" />
+    <End Role="Group_Menu" Type="Self.Group_Menu" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Group">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Group_Menu">
+        <PropertyRef Name="Group_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Group_Menu_Menu">
+    <End Role="Menu" Type="Self.Menu" Multiplicity="1" />
+    <End Role="Group_Menu" Type="Self.Group_Menu" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Menu">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Group_Menu">
+        <PropertyRef Name="Menu_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Order_Customer">
+    <End Role="Customer" Type="Self.Customer" Multiplicity="1" />
+    <End Role="Order" Type="Self.Order" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Customer">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Order">
+        <PropertyRef Name="Order_Customer_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Order_Detail_Order">
+    <End Role="Order" Type="Self.Order" Multiplicity="1" />
+    <End Role="Order_Detail" Type="Self.Order_Detail" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Order">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Order_Detail">
+        <PropertyRef Name="Order_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Stationary_Customer">
+    <End Role="Customer" Type="Self.Customer" Multiplicity="1" />
+    <End Role="Stationary" Type="Self.Stationary" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Customer">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Stationary">
+        <PropertyRef Name="Customer_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Stationary_Detail_Book">
+    <End Role="Book" Type="Self.Book" Multiplicity="0..1" />
+    <End Role="Stationary_Detail" Type="Self.Stationary_Detail" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Book">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Stationary_Detail">
+        <PropertyRef Name="Book_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Stationary_Detail_Product">
+    <End Role="Product" Type="Self.Product" Multiplicity="0..1" />
+    <End Role="Stationary_Detail" Type="Self.Stationary_Detail" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Product">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Stationary_Detail">
+        <PropertyRef Name="Product_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Stationary_Detail_Stationary">
+    <End Role="Stationary" Type="Self.Stationary" Multiplicity="0..1" />
+    <End Role="Stationary_Detail" Type="Self.Stationary_Detail" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Stationary">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Stationary_Detail">
+        <PropertyRef Name="Stationary_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Table_1_Group">
+    <End Role="Group" Type="Self.Group" Multiplicity="1" />
+    <End Role="User_Group" Type="Self.User_Group" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Group">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="User_Group">
+        <PropertyRef Name="Group_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Table_1_User">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="User_Group" Type="Self.User_Group" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="User_Group">
+        <PropertyRef Name="User_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Function Name="fn_diagramobjects" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="int" />
+  <Function Name="sp_alterdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+    <Parameter Name="version" Type="int" Mode="In" />
+    <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+  </Function>
+  <Function Name="sp_creatediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+    <Parameter Name="version" Type="int" Mode="In" />
+    <Parameter Name="definition" Type="varbinary(max)" Mode="In" />
+  </Function>
+  <Function Name="sp_dropdiagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+  </Function>
+  <Function Name="sp_helpdiagramdefinition" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+  </Function>
+  <Function Name="sp_helpdiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+  </Function>
+  <Function Name="sp_renamediagram" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="diagramname" Type="nvarchar" Mode="In" />
+    <Parameter Name="owner_id" Type="int" Mode="In" />
+    <Parameter Name="new_diagramname" Type="nvarchar" Mode="In" />
+  </Function>
+  <Function Name="sp_upgraddiagrams" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+  <EntityContainer Name="ProjectBaseModelStoreContainer">
+    <EntitySet Name="Book" EntityType="Self.Book" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Customer" EntityType="Self.Customer" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Group" EntityType="Self.Group" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Group_Menu" EntityType="Self.Group_Menu" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="HeaderDetails" EntityType="Self.HeaderDetails" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Location" EntityType="Self.Location" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Menu" EntityType="Self.Menu" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Order" EntityType="Self.Order" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Order_Detail" EntityType="Self.Order_Detail" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Setting" EntityType="Self.Setting" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Stationary" EntityType="Self.Stationary" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Stationary_Detail" EntityType="Self.Stationary_Detail" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="User_Group" EntityType="Self.User_Group" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_Group_Menu_Group" Association="Self.FK_Group_Menu_Group">
+      <End Role="Group" EntitySet="Group" />
+      <End Role="Group_Menu" EntitySet="Group_Menu" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Group_Menu_Menu" Association="Self.FK_Group_Menu_Menu">
+      <End Role="Menu" EntitySet="Menu" />
+      <End Role="Group_Menu" EntitySet="Group_Menu" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Order_Customer" Association="Self.FK_Order_Customer">
+      <End Role="Customer" EntitySet="Customer" />
+      <End Role="Order" EntitySet="Order" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Order_Detail_Order" Association="Self.FK_Order_Detail_Order">
+      <End Role="Order" EntitySet="Order" />
+      <End Role="Order_Detail" EntitySet="Order_Detail" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Stationary_Customer" Association="Self.FK_Stationary_Customer">
+      <End Role="Customer" EntitySet="Customer" />
+      <End Role="Stationary" EntitySet="Stationary" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Stationary_Detail_Book" Association="Self.FK_Stationary_Detail_Book">
+      <End Role="Book" EntitySet="Book" />
+      <End Role="Stationary_Detail" EntitySet="Stationary_Detail" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Stationary_Detail_Product" Association="Self.FK_Stationary_Detail_Product">
+      <End Role="Product" EntitySet="Product" />
+      <End Role="Stationary_Detail" EntitySet="Stationary_Detail" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Stationary_Detail_Stationary" Association="Self.FK_Stationary_Detail_Stationary">
+      <End Role="Stationary" EntitySet="Stationary" />
+      <End Role="Stationary_Detail" EntitySet="Stationary_Detail" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Table_1_Group" Association="Self.FK_Table_1_Group">
+      <End Role="Group" EntitySet="Group" />
+      <End Role="User_Group" EntitySet="User_Group" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Table_1_User" Association="Self.FK_Table_1_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="User_Group" EntitySet="User_Group" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

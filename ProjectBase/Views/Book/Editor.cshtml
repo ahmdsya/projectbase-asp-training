@@ -1,0 +1,187 @@
+﻿@model ProjectBase.ViewModels.BookViewModel
+
+@{
+    ViewBag.Title = "[" + Model.mode + "] Book";
+    var mode = Request.QueryString["mode"];
+}
+
+<style type="text/css">
+    td > .two-decimals, .four-decimals {
+        min-width: 70px !important;
+    }
+
+    th {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    td {
+        vertical-align: middle;
+        text-align: center;
+        padding: 0px !important;
+    }
+
+        td > .form-control {
+            border-color: transparent;
+        }
+</style>
+
+<section class="content-header">
+    <h1>
+        @Model.mode
+        <small>Book</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Book</a></li>
+    </ol>
+</section>
+@using (Html.BeginForm("Editor", "Book", new { mode = mode, Id = Request.QueryString["Id"] }, FormMethod.Post, new { id = "EditorForm", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <section class="col-md-12 connectedSortable ui-sortable">
+        <div class="box box-danger">
+            <div class="box-header ui-sortable-handle">
+                <i class="ion ion-bookmark"></i>
+                <h3 class="box-title">Header</h3>
+            </div>
+            <div class="box-body">
+                <div class="form-horizontal">
+                    @Html.ValidationMessage(Constants._ERROR, new { @class = "text-danger" })
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.mode)
+                    @Html.HiddenFor(model => model.result)
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Book_Name, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Book_Name, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Book_Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Authors, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Authors, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Authors, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Quantity, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Quantity, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="box-footer clearfix no-border">
+                <div class="row pull-right">
+                    <div class="col-md-6">
+                        <a href="@Url.Action("Index")" class="btn btn-sm btn-default btn-flat"><i class="fa fa-arrow-left"></i> Back</a>
+                    </div>
+                    <div class="col-md-6">
+                        @{
+                            if (mode == @Constants.FORM_MODE_CREATE)
+                            {
+                                <button id="submit_" type="button" class="btn btn-sm btn-success btn-flat">
+                                    <span class="fa fa-floppy-o"></span> <b>Save</b>
+                                </button>
+                            }
+                            else if (mode == @Constants.FORM_MODE_DELETE)
+                            {
+                                <button id="submit_" type="button" class="btn btn-sm btn-danger btn-flat">
+                                    <span class="fa fa-trash"></span> <b>Delete</b>
+                                </button>
+                            }
+                            else if (mode == @Constants.FORM_MODE_EDIT)
+                            {
+                                <button id="submit_" type="button" class="btn btn-sm btn-success btn-flat">
+                                    <span class="fa fa-edit"></span> <b>Edit</b>
+                                </button>
+                            }
+                        }
+                        <input id="submit" type="submit" style="display:none" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // CLASS var element = $(".");
+            // ID var element = $("#Order_Customer_Id").val(); $("#Order_Customer_Id").hasClass("form-control"); $("#Order_Customer_Id).prop("disabled", true);
+            // DOM object var element = $("input");
+
+            if ($("input[name=mode]").val() == "@Constants.FORM_MODE_VIEW") {
+                $("textarea").each(function () {
+                    $(this).prop('disabled', true);
+                });
+                $("input[type=text]").each(function () {
+                    $(this).prop('disabled', true);
+                });
+                $("input[type=submit]").each(function () {
+                    $(this).prop('disabled', true);
+                });
+            }
+            else if ($("input[name=mode]").val() == "@Constants.FORM_MODE_DELETE") {
+                $("textarea").each(function () {
+                    $(this).prop('readonly', true);
+                });
+                $("input[type=text]").each(function () {
+                    $(this).prop('readonly', true);
+                });
+            }
+
+            if ($("input[name=mode]").val() == "@Constants.FORM_MODE_COPY") {
+                $("#Group_Id, #Group_Description").attr("readonly", true);
+            }
+
+            if ($("#mode").val() == '@Constants.FORM_MODE_VIEW') {
+                $("#EditorForm :input").attr("disabled", true);
+                $("button").attr('disabled', true);
+                $("#submit").attr("disabled", true);
+                $("#submit_").attr("disabled", true);
+            }
+            else if ($("#mode").val() == '@Constants.FORM_MODE_DELETE') {
+                $("#EditorForm :input").not("#submit_, #submit").attr("readonly", true);
+               // $(".select2").attr("disabled", true);
+               // $("button").attr('disabled', true);
+                $("#submit_").val('Delete');
+            }
+
+            $("#submit_").click(function () {
+                bootbox.confirm({
+                    message: "Are you sure?",
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-success btn-primary'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result) {
+                            $("#submit").click();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}
+

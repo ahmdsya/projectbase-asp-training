@@ -1,0 +1,87 @@
+
+-- --------------------------------------------------
+-- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
+-- --------------------------------------------------
+-- Date Created: 08/06/2020 10:13:02
+-- Generated from EDMX file: D:\ProjectBase\ProjectBase\ProjectBase\ProjectBaseEntities.edmx
+-- --------------------------------------------------
+
+SET QUOTED_IDENTIFIER OFF;
+GO
+USE [ProjectBase];
+GO
+GO
+
+-- --------------------------------------------------
+-- Dropping existing FOREIGN KEY constraints
+-- --------------------------------------------------
+
+IF OBJECT_ID(N'[dbo].[FK_Group_Menu_Group]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Group_Menu] DROP CONSTRAINT [FK_Group_Menu_Group];
+GO
+IF OBJECT_ID(N'[dbo].[FK_Group_Menu_Menu]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Group_Menu] DROP CONSTRAINT [FK_Group_Menu_Menu];
+GO
+IF OBJECT_ID(N'[dbo].[FK_Order_Detail_Order]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[Order_Detail] DROP CONSTRAINT [FK_Order_Detail_Order];
+GO
+IF OBJECT_ID(N'[dbo].[FK_Table_1_Group]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[User_Group] DROP CONSTRAINT [FK_Table_1_Group];
+GO
+IF OBJECT_ID(N'[dbo].[FK_Table_1_User]', 'F') IS NOT NULL
+    ALTER TABLE [dbo].[User_Group] DROP CONSTRAINT [FK_Table_1_User];
+GO
+
+-- --------------------------------------------------
+-- Dropping existing tables
+-- --------------------------------------------------
+
+IF OBJECT_ID(N'[dbo].[Customer]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Customer];
+GO
+IF OBJECT_ID(N'[dbo].[Group]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Group];
+GO
+IF OBJECT_ID(N'[dbo].[Group_Menu]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Group_Menu];
+GO
+IF OBJECT_ID(N'[dbo].[Menu]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Menu];
+GO
+IF OBJECT_ID(N'[dbo].[Order]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Order];
+GO
+IF OBJECT_ID(N'[dbo].[Order_Detail]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Order_Detail];
+GO
+IF OBJECT_ID(N'[dbo].[Report]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Report];
+GO
+IF OBJECT_ID(N'[dbo].[Setting]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[Setting];
+GO
+IF OBJECT_ID(N'[dbo].[sysdiagrams]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[sysdiagrams];
+GO
+IF OBJECT_ID(N'[dbo].[User]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[User];
+GO
+IF OBJECT_ID(N'[dbo].[User_Group]', 'U') IS NOT NULL
+    DROP TABLE [dbo].[User_Group];
+GO
+
+-- --------------------------------------------------
+-- Creating all tables
+-- --------------------------------------------------
+
+-- --------------------------------------------------
+-- Creating all PRIMARY KEY constraints
+-- --------------------------------------------------
+
+-- --------------------------------------------------
+-- Creating all FOREIGN KEY constraints
+-- --------------------------------------------------
+
+-- --------------------------------------------------
+-- Script has ended
+-- --------------------------------------------------

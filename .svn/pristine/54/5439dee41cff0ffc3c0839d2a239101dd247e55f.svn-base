@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="fcac50aa9bd84766a977e74e0bb4753c" Name="Diagram1" ZoomLevel="63">
+        <EntityTypeShape EntityType="ProjectBaseModel.Customer" Width="1.5" PointX="5.75" PointY="9.5" />
+        <EntityTypeShape EntityType="ProjectBaseModel.Group" Width="1.5" PointX="0.75" PointY="4.75" />
+        <EntityTypeShape EntityType="ProjectBaseModel.Group_Menu" Width="1.5" PointX="3" PointY="4.25" />
+        <EntityTypeShape EntityType="ProjectBaseModel.Menu" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="ProjectBaseModel.Order" Width="1.5" PointX="8" PointY="9.375" />
+        <EntityTypeShape EntityType="ProjectBaseModel.Order_Detail" Width="1.5" PointX="10.25" PointY="9.5" />
+        <EntityTypeShape EntityType="ProjectBaseModel.Product" Width="1.5" PointX="5.75" PointY="2.125" />
+        <EntityTypeShape EntityType="ProjectBaseModel.Setting" Width="1.5" PointX="7.75" PointY="2.125" />
+        <EntityTypeShape EntityType="ProjectBaseModel.sysdiagram" Width="1.5" PointX="0.75" PointY="9.125" />
+        <EntityTypeShape EntityType="ProjectBaseModel.User" Width="1.5" PointX="3.75" PointY="10.375" />
+        <EntityTypeShape EntityType="ProjectBaseModel.User_Group" Width="1.5" PointX="6" PointY="4.75" />
+        <AssociationConnector Association="ProjectBaseModel.FK_Order_Customer" />
+        <AssociationConnector Association="ProjectBaseModel.FK_Group_Menu_Group" />
+        <AssociationConnector Association="ProjectBaseModel.FK_Table_1_Group" />
+        <AssociationConnector Association="ProjectBaseModel.FK_Group_Menu_Menu" />
+        <AssociationConnector Association="ProjectBaseModel.FK_Order_Detail_Order" />
+        <AssociationConnector Association="ProjectBaseModel.FK_Table_1_User" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

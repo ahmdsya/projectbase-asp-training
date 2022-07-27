@@ -1,0 +1,33 @@
+﻿@{
+    ViewBag.Title = "ShowSummary";
+    Layout = null; //Show report does not use the default template, thus use Layout=null
+}
+
+<html>
+<head>
+    @Scripts.RenderFormat("<script type='text/javascript' src='{0}'></script>", "~/jquery/js")
+    @Styles.Render("~/adminlte_min/css")
+    @Scripts.RenderFormat("<script type='text/javascript' src='{0}'></script>", "~/adminlte_min/js")
+</head>
+<body>
+    <div class="table-responsive">
+        <table class="table table-bordered" width="100%">
+            <thead>
+                <tr>
+                    <th>Order No</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                @Html.Raw(ViewData["DATA"])
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
+
+
+

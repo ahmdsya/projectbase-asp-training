@@ -1,0 +1,306 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="ProjectBaseModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="ProjectBaseEntities" annotation:LazyLoadingEnabled="true">
+    <FunctionImport Name="sp_alterdiagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+      <Parameter Name="version" Mode="In" Type="Int32" />
+      <Parameter Name="definition" Mode="In" Type="Binary" />
+    </FunctionImport>
+    <FunctionImport Name="sp_creatediagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+      <Parameter Name="version" Mode="In" Type="Int32" />
+      <Parameter Name="definition" Mode="In" Type="Binary" />
+    </FunctionImport>
+    <FunctionImport Name="sp_dropdiagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_helpdiagramdefinition" ReturnType="Collection(ProjectBaseModel.sp_helpdiagramdefinition_Result)">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_helpdiagrams" ReturnType="Collection(ProjectBaseModel.sp_helpdiagrams_Result)">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="sp_renamediagram">
+      <Parameter Name="diagramname" Mode="In" Type="String" />
+      <Parameter Name="owner_id" Mode="In" Type="Int32" />
+      <Parameter Name="new_diagramname" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="sp_upgraddiagrams" />
+    <EntitySet Name="Customers" EntityType="ProjectBaseModel.Customer" />
+    <EntitySet Name="Groups" EntityType="ProjectBaseModel.Group" />
+    <EntitySet Name="Group_Menu" EntityType="ProjectBaseModel.Group_Menu" />
+    <EntitySet Name="Menus" EntityType="ProjectBaseModel.Menu" />
+    <EntitySet Name="Orders" EntityType="ProjectBaseModel.Order" />
+    <EntitySet Name="Order_Detail" EntityType="ProjectBaseModel.Order_Detail" />
+    <EntitySet Name="Products" EntityType="ProjectBaseModel.Product" />
+    <EntitySet Name="Settings" EntityType="ProjectBaseModel.Setting" />
+    <EntitySet Name="sysdiagrams" EntityType="ProjectBaseModel.sysdiagram" />
+    <EntitySet Name="Users" EntityType="ProjectBaseModel.User" />
+    <EntitySet Name="User_Group" EntityType="ProjectBaseModel.User_Group" />
+    <AssociationSet Name="FK_Order_Customer" Association="ProjectBaseModel.FK_Order_Customer">
+      <End Role="Customer" EntitySet="Customers" />
+      <End Role="Order" EntitySet="Orders" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Group_Menu_Group" Association="ProjectBaseModel.FK_Group_Menu_Group">
+      <End Role="Group" EntitySet="Groups" />
+      <End Role="Group_Menu" EntitySet="Group_Menu" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Table_1_Group" Association="ProjectBaseModel.FK_Table_1_Group">
+      <End Role="Group" EntitySet="Groups" />
+      <End Role="User_Group" EntitySet="User_Group" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Group_Menu_Menu" Association="ProjectBaseModel.FK_Group_Menu_Menu">
+      <End Role="Menu" EntitySet="Menus" />
+      <End Role="Group_Menu" EntitySet="Group_Menu" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Order_Detail_Order" Association="ProjectBaseModel.FK_Order_Detail_Order">
+      <End Role="Order" EntitySet="Orders" />
+      <End Role="Order_Detail" EntitySet="Order_Detail" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Table_1_User" Association="ProjectBaseModel.FK_Table_1_User">
+      <End Role="User" EntitySet="Users" />
+      <End Role="User_Group" EntitySet="User_Group" />
+    </AssociationSet>
+  </EntityContainer>
+  <ComplexType Name="sp_helpdiagramdefinition_Result">
+    <Property Type="Int32" Name="version" Nullable="true" />
+    <Property Type="Binary" Name="definition" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="sp_helpdiagrams_Result">
+    <Property Type="String" Name="Database" Nullable="true" MaxLength="128" />
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="128" />
+    <Property Type="Int32" Name="ID" Nullable="false" />
+    <Property Type="String" Name="Owner" Nullable="true" MaxLength="128" />
+    <Property Type="Int32" Name="OwnerID" Nullable="false" />
+  </ComplexType>
+  <EntityType Name="Customer">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Code" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Address" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Created_Date" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Created_By" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Edited_Date" Type="DateTime" Precision="3" />
+    <Property Name="Edited_By" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Is_Deleted" Type="Boolean" />
+    <NavigationProperty Name="Orders" Relationship="ProjectBaseModel.FK_Order_Customer" FromRole="Customer" ToRole="Order" />
+  </EntityType>
+  <EntityType Name="Group">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Group_Code" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Group_Description" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Name="Create_Date" Type="DateTime" Precision="3" />
+    <Property Name="Create_By" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Edit_Date" Type="DateTime" Precision="3" />
+    <Property Name="Edit_By" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Group_Menu" Relationship="ProjectBaseModel.FK_Group_Menu_Group" FromRole="Group" ToRole="Group_Menu" />
+    <NavigationProperty Name="User_Group" Relationship="ProjectBaseModel.FK_Table_1_Group" FromRole="Group" ToRole="User_Group" />
+  </EntityType>
+  <EntityType Name="Group_Menu">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Group_Id" Type="Int64" Nullable="false" />
+    <Property Name="Menu_Id" Type="Int64" Nullable="false" />
+    <Property Name="View" Type="Boolean" Nullable="false" />
+    <Property Name="Edit" Type="Boolean" Nullable="false" />
+    <Property Name="Delete" Type="Boolean" Nullable="false" />
+    <Property Name="Create" Type="Boolean" Nullable="false" />
+    <Property Name="Print" Type="Boolean" Nullable="false" />
+    <Property Name="Create_Date" Type="DateTime" Precision="3" />
+    <Property Name="Create_By" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Edit_Date" Type="DateTime" Precision="3" />
+    <Property Name="Edit_By" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Group" Relationship="ProjectBaseModel.FK_Group_Menu_Group" FromRole="Group_Menu" ToRole="Group" />
+    <NavigationProperty Name="Menu" Relationship="ProjectBaseModel.FK_Group_Menu_Menu" FromRole="Group_Menu" ToRole="Menu" />
+  </EntityType>
+  <EntityType Name="Menu">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Menu_Name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Menu_Action" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Menu_Controller" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Menu_Icon" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Parent" Type="Int64" />
+    <Property Name="Ordinal" Type="Int32" />
+    <Property Name="Visible" Type="Boolean" />
+    <NavigationProperty Name="Group_Menu" Relationship="ProjectBaseModel.FK_Group_Menu_Menu" FromRole="Menu" ToRole="Group_Menu" />
+  </EntityType>
+  <EntityType Name="Order">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Order_No" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Order_Date" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Order_Customer_Id" Type="Int64" Nullable="false" />
+    <Property Name="Order_Customer_Address" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Create_Date" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Create_By" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Edit_Date" Type="DateTime" Precision="3" />
+    <Property Name="Edit_By" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Is_Deleted" Type="Boolean" />
+    <NavigationProperty Name="Customer" Relationship="ProjectBaseModel.FK_Order_Customer" FromRole="Order" ToRole="Customer" />
+    <NavigationProperty Name="Order_Detail" Relationship="ProjectBaseModel.FK_Order_Detail_Order" FromRole="Order" ToRole="Order_Detail" />
+  </EntityType>
+  <EntityType Name="Order_Detail">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Order_Id" Type="Int64" Nullable="false" />
+    <Property Name="Product_Name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Product_Qty" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="Product_UOM" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Create_Date" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Create_By" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Edit_Date" Type="DateTime" Precision="3" />
+    <Property Name="Edit_By" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Order" Relationship="ProjectBaseModel.FK_Order_Detail_Order" FromRole="Order_Detail" ToRole="Order" />
+  </EntityType>
+  <EntityType Name="Product">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Product_Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Product_Qty" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="Product_UOM" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="Setting">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Code" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Value" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="sysdiagram">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+    <Property Name="principal_id" Type="Int32" Nullable="false" />
+    <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version" Type="Int32" />
+    <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Employee_Number" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Full_Name" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="Password" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="Email" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+    <Property Name="Is_Admin" Type="Boolean" Nullable="false" />
+    <Property Name="Use_AD" Type="Boolean" Nullable="false" />
+    <Property Name="Create_By" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Create_Date" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Edit_By" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Edit_Date" Type="DateTime" Precision="3" />
+    <Property Name="Last_Access_Date" Type="DateTime" Precision="3" />
+    <NavigationProperty Name="User_Group" Relationship="ProjectBaseModel.FK_Table_1_User" FromRole="User" ToRole="User_Group" />
+  </EntityType>
+  <EntityType Name="User_Group">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="User_Id" Type="Int64" Nullable="false" />
+    <Property Name="Group_Id" Type="Int64" Nullable="false" />
+    <Property Name="Create_Date" Type="DateTime" Precision="3" />
+    <Property Name="Create_By" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Edit_Date" Type="DateTime" Precision="3" />
+    <Property Name="Edit_By" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="Group" Relationship="ProjectBaseModel.FK_Table_1_Group" FromRole="User_Group" ToRole="Group" />
+    <NavigationProperty Name="User" Relationship="ProjectBaseModel.FK_Table_1_User" FromRole="User_Group" ToRole="User" />
+  </EntityType>
+  <Association Name="FK_Order_Customer">
+    <End Type="ProjectBaseModel.Customer" Role="Customer" Multiplicity="1" />
+    <End Type="ProjectBaseModel.Order" Role="Order" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Customer">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Order">
+        <PropertyRef Name="Order_Customer_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Group_Menu_Group">
+    <End Type="ProjectBaseModel.Group" Role="Group" Multiplicity="1" />
+    <End Type="ProjectBaseModel.Group_Menu" Role="Group_Menu" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Group">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Group_Menu">
+        <PropertyRef Name="Group_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Table_1_Group">
+    <End Type="ProjectBaseModel.Group" Role="Group" Multiplicity="1" />
+    <End Type="ProjectBaseModel.User_Group" Role="User_Group" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Group">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="User_Group">
+        <PropertyRef Name="Group_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Group_Menu_Menu">
+    <End Type="ProjectBaseModel.Menu" Role="Menu" Multiplicity="1" />
+    <End Type="ProjectBaseModel.Group_Menu" Role="Group_Menu" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Menu">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Group_Menu">
+        <PropertyRef Name="Menu_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Order_Detail_Order">
+    <End Type="ProjectBaseModel.Order" Role="Order" Multiplicity="1" />
+    <End Type="ProjectBaseModel.Order_Detail" Role="Order_Detail" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Order">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Order_Detail">
+        <PropertyRef Name="Order_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Table_1_User">
+    <End Type="ProjectBaseModel.User" Role="User" Multiplicity="1" />
+    <End Type="ProjectBaseModel.User_Group" Role="User_Group" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="User_Group">
+        <PropertyRef Name="User_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

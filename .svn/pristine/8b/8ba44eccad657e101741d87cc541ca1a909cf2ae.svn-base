@@ -1,0 +1,113 @@
+﻿using ProjectBase.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace ProjectBase.Controllers
+{
+    public class GroupController : Controller
+    {
+        ProjectBaseEntities db = new ProjectBaseEntities();
+
+        [CustomAuthorize]
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult LoadData(string draw = null, string start = null, string length = null, OrderClass[] order = null, ColumnClass[] columns = null, string[] filter = null)
+        {
+            try
+            {
+                int pageSize = length != null ? Convert.ToInt32(length) : 0;
+                int skip = start != null ? Convert.ToInt32(start) : 0;
+                int filteredTotal = 0, recordsTotal = 0;
+                string orderBy = string.Join(",", order.Select(r => ("A." + columns[r.column].data + " " + r.dir)));
+                orderBy = orderBy.Replace("A.Group_Code", "A.Group_Code");
+                string query = @"
+                    SELECT A.*
+                    FROM [Group] A
+                    WHERE 1=1 {0}
+                    ORDER BY {3} {2} {1}
+                ", whereQuery = "",
+                queryCount = @"SELECT COUNT(A.Id) AS Count_ FROM [Group] A WHERE 1=1 {0}";
+
+                List<SqlParameter> parameters = new List<SqlParameter>();
+                if (filter != null && filter.Length > 0)
+                {
+                    for (int i = 0; i < filter.Length; i++)
+                    {
+                        if (string.IsNullOrEmpty(filter[i]))
+                            continue;
+                        string columnName = columns[i].data;
+                        string tableAlias = "A.";
+                        if (columnName == "Process_Group_Code")
+                            tableAlias = "B.";
+                        else if (columnName == "Location_Code")
+                            tableAlias = "C.";
+
+                        whereQuery += " AND " + tableAlias + columnName + " LIKE @" + columnName;
+                        parameters.Add(new SqlParameter("@" + columnName, "%" + filter[i] + "%"));
+                    }
+                }
+
+                List<SqlParameter> parameterc = new List<SqlParameter>();
+                foreach (SqlParameter prm in parameters)
+                    parameterc.Add(new SqlParameter(prm.ParameterName, prm.Value));
+
+                List<GroupViewModel> listOfData_ =
+                    db.Database.SqlQuery<GroupViewModel>(string.Format(query, whereQuery, (pageSize > 0 ? "FETCH NEXT " + pageSize.ToString() + " ROWS ONLY" : ""), (skip > -1 ? "OFFSET " + skip.ToString() + " ROWS" : ""), (string.IsNullOrEmpty(orderBy) ? "Create_Date DESC" : orderBy)), parameters.ToArray())
+                    .ToList();
+
+                var qc = db.Database.SqlQuery<Int32>(string.Format(queryCount, whereQuery), parameterc.ToArray()).ToArray();
+                filteredTotal = qc.Length > 0 ? qc[0] : 0;
+
+                var qt = db.Database.SqlQuery<Int32>(string.Format(queryCount, "")).ToArray();
+                recordsTotal = qt.Length > 0 ? qt[0] : 0;
+
+                return Json(new { draw = draw, recordsFiltered = filteredTotal, recordsTotal = recordsTotal, data = listOfData_ });
+            }
+            catch (Exception exc)
+            {
+                var a = exc.Message;
+                throw;
+            }
+        }
+
+        [CustomAuthorize]
+        public ActionResult Editor(string mode, long? Id)
+        {
+            GroupViewModel viewModel = new GroupViewModel();
+            if (mode != Constants.FORM_MODE_CREATE && Id != null)
+                viewModel = new GroupViewModel(db, Id.Value);
+            else if (mode != Constants.FORM_MODE_CREATE && Id == null)
+                return RedirectToAction("Index");
+            viewModel.mode = mode;
+            return View("Editor", viewModel);
+        }
+
+        [HttpPost]
+        public ActionResult Editor(GroupViewModel viewModel)
+        {
+            var a = ModelState.AsEnumerable().Where(r => r.Value.Errors.Count > 0).ToList();
+            if (ModelState.IsValid)
+            {
+                viewModel.Save(db);
+                if (viewModel.result == Constants.OK)
+                    return RedirectToAction("Index");
+                else
+                {
+                    ModelState.AddModelError(Constants._ERROR, viewModel.result);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError(Constants._ERROR, string.Join(",", (ModelState.Values.Where(r => r.Errors.Count > 0).SelectMany(r => r.Errors).Select(r => r.ErrorMessage).ToArray())) + "<br/>");
+            }
+            return View("Editor", viewModel);
+        }
+    }
+}

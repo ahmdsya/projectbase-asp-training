@@ -1,0 +1,395 @@
+﻿@model ProjectBase.ViewModels.OrderViewModel
+@{
+    ViewBag.Title = "[" + Model.mode + "] Order";
+    var mode = Request.QueryString["mode"];
+}
+<style type="text/css">
+    td > .two-decimals, .four-decimals {
+        min-width: 70px !important;
+    }
+
+    th {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    td {
+        vertical-align: middle;
+        text-align: center;
+        padding: 0px !important;
+    }
+
+        td > .form-control {
+            border-color: transparent;
+        }
+</style>
+<section class="content-header">
+    <h1>
+        @Model.mode
+        <small>Order</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Order</a></li>
+    </ol>
+</section>
+@using (Html.BeginForm("Editor", "Order", new { mode = mode, Id = Request.QueryString["Id"] }, FormMethod.Post, new { id = "EditorForm", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <section class="col-md-12 connectedSortable ui-sortable">
+        <div class="box box-danger">
+            <div class="box-header ui-sortable-handle">
+                <i class="ion ion-bookmark"></i>
+                <h3 class="box-title">Header</h3>
+            </div>
+            <div class="box-body">
+                <div class="form-horizontal">
+                    @Html.ValidationMessage(Constants._ERROR, new { @class = "text-danger" })
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.mode)
+                    @Html.HiddenFor(model => model.result)
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Order_No, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Order_No, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Order_No, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Order_Date, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Order_Date, new { htmlAttributes = new { @class = "form-control datepicker" } })
+                            @Html.ValidationMessageFor(model => model.Order_Date, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Order_Customer_Id, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Order_Customer_Id, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Order_Customer_Id, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Order_Customer_Address, htmlAttributes: new { @class = "control-label col-sm-4" })
+                        <div class="col-sm-8">
+                            @Html.EditorFor(model => model.Order_Customer_Address, new { htmlAttributes = new { @class = "form-control", @readonly = true } })
+                            @Html.ValidationMessageFor(model => model.Order_Customer_Address, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="box-footer clearfix no-border">
+                <div class="row pull-right">
+                    <div class="col-md-6">
+                        <a href="@Url.Action("Index")" class="btn btn-sm btn-default btn-flat"><i class="fa fa-arrow-left"></i> Back</a>
+                    </div>
+                    <div class="col-md-6">
+                        @{
+                            if (mode == @Constants.FORM_MODE_CREATE)
+                            {
+                                <button id="submit_" type="button" class="btn btn-sm btn-success btn-flat">
+                                    <span class="fa fa-floppy-o"></span> <b>Save</b>
+                                </button>
+                            }
+                            else if (mode == @Constants.FORM_MODE_DELETE)
+                            {
+                                <button id="submit_" type="button" class="btn btn-sm btn-danger btn-flat">
+                                    <span class="fa fa-trash"></span> <b>Delete</b>
+                                </button>
+                            }
+                            else if (mode == @Constants.FORM_MODE_EDIT)
+                            {
+                                <button id="submit_" type="button" class="btn btn-sm btn-success btn-flat">
+                                    <span class="fa fa-edit"></span> <b>Edit</b>
+                                </button>
+                            }
+                        }
+                        <input id="submit" type="submit" style="display:none" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="col-md-7 connectedSortable ui-sortable">
+        <div class="box box-info">
+            <div class="box-header ui-sortable-handle">
+                <i class="ion ion-clipboard"></i>
+                <h3 class="box-title">Details</h3>
+            </div>
+            <div class="box-body">
+                <div class="table-responsive">
+                    <table class="table-condensed table-bordered table-striped" id="table_detail" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <button type="button" id="btn-add-detail" class="btn btn-xs btn-sm btn-success btn-flat"><i class="fa fa-plus"></i></button>
+                                </th>
+                                <th>Product Name</th>
+                                <th>Quantity</th>
+                                <th>Product UOM</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_detail">
+                            <tr class="tr-blueprint" style="display:none">
+                                <td>
+                                    <button type="button" class="btn btn-xs btn-sm btn-danger btn-flat btn-del-detail"><i class="fa fa-minus"></i></button>
+                                    <input type="hidden" name="Id" value="0" />
+                                    <input type="hidden" name="Order_Id" value="0" />
+
+                                    <input type="hidden" name="mode" value="@Constants.FORM_MODE_CREATE" />
+                                </td>
+                                <td>
+                                    <input type="text" name="Product_Name" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="Product_Qty" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="text" name="Product_UOM" class="form-control" readonly />
+                                </td>
+                            </tr>
+                            @{
+                                if (Model != null && Model.Details != null && Model.Details.Count > 0)
+                                {
+                                    for (int i = 0; i < Model.Details.Count; i++)
+                                    {
+                                        var Detail = Model.Details[i];
+                                        <tr>
+                                            <td>
+                                                <button type="button" class="btn btn-xs btn-sm btn-danger btn-flat btn-del-detail"><i class="fa fa-minus"></i></button>
+                                                <input type="hidden" name="Details[@i.ToString()].Id" value="@Detail.Id" />
+                                                <input type="hidden" name="Details[@i.ToString()].Order_Id" value="@Detail.Order_Id" />
+                                                <input type="hidden" name="Details[@i.ToString()].mode" value="@Detail.mode" />
+                                            </td>
+                                            <td>
+                                                <input type="text" name="Details[@i.ToString()].Product_Name" class="form-control" value="@(Detail.Product_Name)" />
+                                            </td>
+                                            <td>
+                                                <input type="text" name="Details[@i.ToString()].Product_Qty" class="form-control" value="@(Detail.Product_Qty)" />
+                                            </td>
+                                            <td>
+                                                <input type="text" name="Details[@i.ToString()].Product_UOM" class="form-control" value="@(Detail.Product_UOM)" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="box-footer clearfix no-border">
+            </div>
+        </div>
+    </section>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // CLASS var element = $(".");
+            // ID var element = $("#Order_Customer_Id").val(); $("#Order_Customer_Id").hasClass("form-control"); $("#Order_Customer_Id).prop("disabled", true);
+            // DOM object var element = $("input");
+
+            InitAjaxSelect2($("#Order_Customer_Id"), '@Url.Action("CustomerList", "Ajax")', function () { return {} }, -1);
+
+            $("#Order_Customer_Id").change(function () {
+                //var addr = $("input[name='Order_Customer_Address']");
+                var addr = $("#Order_Customer_Address");
+
+                $.ajax({
+                    url: '@Url.Action("GetCustomerData", "Ajax")',
+                    type: "GET",
+                    datatype: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: { Id: $(this).val() },
+                    success: function (response) {
+                        if (response) {
+                            $(addr).val(response.Address).change();
+                        }
+                    },
+                    fail: function () { }
+                });
+            });
+
+            if ($("input[name=mode]").val() == "@Constants.FORM_MODE_VIEW") {
+                $("textarea").each(function () {
+                    $(this).prop('disabled', true);
+                });
+                $("input[type=text]").each(function () {
+                    $(this).prop('disabled', true);
+                });
+                $("input[type=submit]").each(function () {
+                    $(this).prop('disabled', true);
+                });
+            }
+            else if ($("input[name=mode]").val() == "@Constants.FORM_MODE_DELETE") {
+                $("textarea").each(function () {
+                    $(this).prop('readonly', true);
+                });
+                $("input[type=text]").each(function () {
+                    $(this).prop('readonly', true);
+                });
+            }
+
+            $("#tbody_detail tr:not(.tr-blueprint)").each(function (i) {
+                var menuId = $("input[name$='.Product_Name']", $(this));
+
+                InitAjaxSelect2(menuId, '@Url.Action("ProductList", "Ajax")', function () { return {} }, -1);
+
+                $(menuId).change(function () {
+                    var row = (menuId).closest('tr');
+
+                    var uom = $("input[name$='.Product_UOM']", row);
+
+                    $.ajax({
+                        url: '@Url.Action("GetProductData", "Ajax")',
+                        type: "GET",
+                        datatype: "json",
+                        contentType: "application/json; charset=utf-8",
+                        data: { Id: $(menuId).val() },
+                        success: function (response) {
+                            if (response) {
+                                $(uom).val(response.Product_UOM).change();
+                                $(uom).prop('readonly', true);
+                            }
+                        },
+                        fail: function () { }
+                    });
+                });
+            });
+
+            $("#btn-add-detail").click(function () {
+                var tbl = $(this).closest("table");
+                var blueprint = tbl.find(".tr-blueprint").first().clone();
+                var rowCount = $("#tbody_detail tr:not(.tr-blueprint)").length;
+                blueprint.appendTo(tbl).removeClass("tr-blueprint").show();
+                var tableName = "Details[" + rowCount + "].";
+                $("input[type=text]", blueprint).each(function () {
+                    var name = $(this).prop('name');
+
+                    $(this).prop('name', tableName + $(this).prop('name'));
+
+                    if (name == "Product_Name") {
+                        InitAjaxSelect2($(this), '@Url.Action("ProductList", "Ajax")', function () { return {} }, -1);
+
+                        $(this).change(function () {
+                            var row = (this).closest('tr');
+
+                            var uom = $("input[name$='.Product_UOM']", row);
+
+                            $.ajax({
+                                url: '@Url.Action("GetProductData", "Ajax")',
+                                type: "GET",
+                                datatype: "json",
+                                contentType: "application/json; charset=utf-8",
+                                data: { Id: $(this).val() },
+                                success: function (response) {
+                                    if (response) {
+                                        $(uom).val(response.Product_UOM).change();
+                                        $(uom).prop('readonly', true);
+                                    }
+                                },
+                                fail: function () { }
+
+                            });
+                        });
+                    }
+                });
+
+                $("input[type=checkbox]", blueprint).each(function () {
+                    var name = $(this).prop('name');
+
+                    $(this).prop('name', tableName + $(this).prop('name'));
+
+                    $(this).change(function () {
+                        if ($(this).prop("checked")) $(this).val(true);
+                        else $(this).val(false);
+                    }).change();
+
+                });
+
+                $("input[type=hidden]", blueprint).each(function () {
+                    $(this).prop('name', tableName + $(this).prop('name'));
+                });
+
+                $("textarea", blueprint).each(function () {
+                    $(this).prop('name', tableName + $(this).prop('name'));
+                });
+                $(".btn-del-detail", blueprint).click(function () {
+                    var row = $(this).closest("tr");
+                    var td = $(row).find('td');
+
+                    var detailMode = $("[name$='.mode']", $(row)).val();
+                    if (detailMode == '@Constants.FORM_MODE_CREATE')
+                        row.remove();
+                    else {
+                        $("[name$='.mode']", $(row)).val('@Constants.FORM_MODE_DELETE');
+                        $(row).attr('style', 'display:none');
+                    }
+                });
+                reInitInputs();
+            });
+
+            $(".btn-del-detail").click(function () {
+                var row = $(this).closest("tr");
+
+                var detailMode = $("[name$='.mode']", $(row)).val();
+                if (detailMode == '@Constants.FORM_MODE_CREATE')
+                    row.remove();
+                else {
+                    $("[name$='.mode']", $(row)).val('@Constants.FORM_MODE_DELETE');
+                    $(row).attr('style', 'display:none');
+                }
+            });
+
+            $('#tbody_detail tr:not(.tr-blueprint) input, textarea').on('change', function () {
+                var tr = this.closest('tr');
+                var x = $("[name$='.mode']", $(tr)).val();
+                if (x == '@Constants.FORM_MODE_UNCHANGED')
+                    $("[name$='.mode']", $(tr)).val('@Constants.FORM_MODE_EDIT');
+            });
+
+            if ($("input[name=mode]").val() == "@Constants.FORM_MODE_COPY") {
+                $("#Group_Id, #Group_Description").attr("readonly", true);
+            }
+
+            if ($("#mode").val() == '@Constants.FORM_MODE_VIEW') {
+                $("#EditorForm :input").attr("disabled", true);
+                $("button").attr('disabled', true);
+                $("#submit").attr("disabled", true);
+                $("#submit_").attr("disabled", true);
+            }
+            else if ($("#mode").val() == '@Constants.FORM_MODE_DELETE') {
+                $("#EditorForm :input").not("#submit_, #submit").attr("readonly", true);
+               // $(".select2").attr("disabled", true);
+               // $("button").attr('disabled', true);
+                $("#submit_").val('Delete');
+            }
+
+            $("#submit_").click(function () {
+                bootbox.confirm({
+                    message: "Are you sure?",
+                    buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-success btn-primary'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-danger'
+                        }
+                    },
+                    callback: function (result) {
+                        if (result) {
+                            $("#submit").click();
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}
